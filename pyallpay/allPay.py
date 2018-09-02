@@ -4,14 +4,14 @@ import datetime
 import urllib
 import hashlib
 import logging
-from utilities import do_str_replace
+from pyallpay.utilities import do_str_replace
 '''
     Configure your personal setting in setting.py
 '''
-from setting import HASH_IV, HASH_KEY
-from setting import AIO_SANDBOX_SERVICE_URL, AIO_SERVICE_URL, RETURN_URL, CLIENT_BACK_URL, PAYMENT_INFO_URL
-from setting import MERCHANT_ID
-from setting import ALLPAY_SANDBOX
+from pyallpay.setting import HASH_IV, HASH_KEY
+from pyallpay.setting import AIO_SANDBOX_SERVICE_URL, AIO_SERVICE_URL, RETURN_URL, CLIENT_BACK_URL, PAYMENT_INFO_URL
+from pyallpay.setting import MERCHANT_ID
+from pyallpay.setting import ALLPAY_SANDBOX
 
 
 class AllPay():
