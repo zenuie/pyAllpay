@@ -4,14 +4,16 @@ import datetime
 import urllib
 import hashlib
 import logging
-from utilities import do_str_replace
+import six
+
+from pyallpay.utilities import do_str_replace
 '''
     Configure your personal setting in setting.py
 '''
-from setting import HASH_IV, HASH_KEY
-from setting import AIO_SANDBOX_SERVICE_URL, AIO_SERVICE_URL, RETURN_URL, CLIENT_BACK_URL, PAYMENT_INFO_URL
-from setting import MERCHANT_ID
-from setting import ALLPAY_SANDBOX
+from pyallpay.setting import HASH_IV, HASH_KEY
+from pyallpay.setting import AIO_SANDBOX_SERVICE_URL, AIO_SERVICE_URL, RETURN_URL, CLIENT_BACK_URL, PAYMENT_INFO_URL
+from pyallpay.setting import MERCHANT_ID
+from pyallpay.setting import ALLPAY_SANDBOX
 
 
 class AllPay():
@@ -55,18 +57,38 @@ class AllPay():
             self.url_dict['PaymentInfoURL'] = PAYMENT_INFO_URL if not ('PaymentInfoURL' in payment_conf) else payment_conf['PaymentInfoURL']
 
     def check_out(self):
-        sorted_dict = sorted(self.url_dict.iteritems())
+        if six.PY3:
+            sorted_dict = sorted(self.url_dict.items())
+        else:
+            sorted_dict = sorted(self.url_dict.iteritems())
 
         # insert the HashKey to the head of dictionary & HashIv to the end
         sorted_dict.insert(0, ('HashKey', self.HASH_KEY))
         sorted_dict.append(('HashIV', self.HASH_IV))
 
-        result_request_str = do_str_replace(urllib.quote(urllib.urlencode(sorted_dict), '+%').lower())
+        if six.PY3:
+            result_request_str = do_str_replace(
+                urllib.parse.quote(
+                urllib.parse.urlencode(sorted_dict), '+%').lower())
+                
+            logging.info(
+                urllib.parse.quote(
+                urllib.parse.urlencode(sorted_dict), '+').lower())
+        else:
+            result_request_str = do_str_replace(
+                urllib.quote(urllib.urlencode(sorted_dict), '+%').lower())
 
-        logging.info(urllib.quote(urllib.urlencode(sorted_dict), '+').lower())
+            logging.info(
+                urllib.quote(
+                urllib.urlencode(sorted_dict), '+').lower())
 
         # md5 encoding
-        check_mac_value = hashlib.md5(result_request_str).hexdigest().upper()
+        if six.PY3:
+            check_mac_value = hashlib.md5(
+                result_request_str.encode()).hexdigest().upper()
+        else:
+            check_mac_value = hashlib.md5(
+                result_request_str).hexdigest().upper()
         self.url_dict['CheckMacValue'] = check_mac_value
         return self.url_dict
 
@@ -85,7 +107,7 @@ class AllPay():
             period_type_replace_map = {'Y': 'Year', 'M': 'Month', 'D': 'Day'}
             for key, val in post.iteritems():
 
-                print key, val
+                #print key, val
                 if key == 'CheckMacValue':
                     check_mac_value = val
                 else:
@@ -126,7 +148,7 @@ class AllPay():
         form_html = '<form id="allPay-Form" name="allPayForm" method="post" target="_self" action="%s" style="display: none;">' % self.service_url
 
         for i, val in enumerate(dict_url):
-            print val, dict_url[val]
+            #print val, dict_url[val]
             form_html = "".join((form_html, "<input type='hidden' name='%s' value='%s' />" % (val, dict_url[val])))
 
         form_html = "".join((form_html, '<input type="submit" class="large" id="payment-btn" value="BUY" /></form>'))
