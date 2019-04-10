@@ -4,6 +4,8 @@ import datetime
 import urllib
 import hashlib
 import logging
+import six
+
 from pyallpay.utilities import do_str_replace
 '''
     Configure your personal setting in setting.py
@@ -55,18 +57,38 @@ class AllPay():
             self.url_dict['PaymentInfoURL'] = PAYMENT_INFO_URL if not ('PaymentInfoURL' in payment_conf) else payment_conf['PaymentInfoURL']
 
     def check_out(self):
-        sorted_dict = sorted(self.url_dict.iteritems())
+        if six.PY3:
+            sorted_dict = sorted(self.url_dict.items())
+        else:
+            sorted_dict = sorted(self.url_dict.iteritems())
 
         # insert the HashKey to the head of dictionary & HashIv to the end
         sorted_dict.insert(0, ('HashKey', self.HASH_KEY))
         sorted_dict.append(('HashIV', self.HASH_IV))
 
-        result_request_str = do_str_replace(urllib.quote(urllib.urlencode(sorted_dict), '+%').lower())
+        if six.PY3:
+            result_request_str = do_str_replace(
+                urllib.parse.quote(
+                urllib.parse.urlencode(sorted_dict), '+%').lower())
+                
+            logging.info(
+                urllib.parse.quote(
+                urllib.parse.urlencode(sorted_dict), '+').lower())
+        else:
+            result_request_str = do_str_replace(
+                urllib.quote(urllib.urlencode(sorted_dict), '+%').lower())
 
-        logging.info(urllib.quote(urllib.urlencode(sorted_dict), '+').lower())
+            logging.info(
+                urllib.quote(
+                urllib.urlencode(sorted_dict), '+').lower())
 
         # md5 encoding
-        check_mac_value = hashlib.md5(result_request_str).hexdigest().upper()
+        if six.PY3:
+            check_mac_value = hashlib.md5(
+                result_request_str.encode()).hexdigest().upper()
+        else:
+            check_mac_value = hashlib.md5(
+                result_request_str).hexdigest().upper()
         self.url_dict['CheckMacValue'] = check_mac_value
         return self.url_dict
 
