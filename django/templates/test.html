@@ -1,0 +1,13 @@
+<head>
+    <meta charset="UTF-8">
+    <title>測試</title>
+</head>
+<body>
+
+<form method=POST action={{ test_url }}>
+    {% for data,value in datas %}
+            <input type='hidden' name='{{ data }}' value='{{ value }}'/>
+    {% endfor %}
+    <input type=submit value=BUY>
+</form>
+</body>
