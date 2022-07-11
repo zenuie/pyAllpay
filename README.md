@@ -1,12 +1,12 @@
 Introduction
 ==
-![](https://img.shields.io/badge/pyallpay-version_0.0.12-yellow.svg) ![](https://img.shields.io/badge/python-2.7.5-green.svg) ![](https://img.shields.io/badge/django-1.5.6-blue.svg)  
-This is an unofficial allPay(歐付寶) SDK implemented in Python. not All functions are implemented now.
+![](https://img.shields.io/badge/python-3.9-green.svg) ![](https://img.shields.io/badge/django-4.0.3-blue.svg)  
+This is an unofficial OPay(歐付寶) SDK implemented in Python. not O functions are implemented now.
 CheckOutString(), CheckOut(), CheckOutFeedback() has been implemented.
 In general, it could be used in web developed by Django ..etc  
-**[!!NOTE!!] allPay may updates their SDK constantly, if `pyallpay` doesn't work. Please file a issue.**
+**[!!NOTE!!] OPay may updates their SDK constantly, if `pyOpay` doesn't work. Please file a issue.**
 
-### For Python 3, please refer to the [py3allpay](https://github.com/m85091081/py3allpay) by @ m85091081.
+### For Python 3, please refer to the [py3Opay](https://github.com/m85091081/py3Opay) by @ m85091081.
 
 Features:
 ==
@@ -18,51 +18,48 @@ Checkout a payment in ...
 - [x] BarCode
 - [x] Credit card
 
-Dealing with the POST data returned by 歐付寶(allPay) after the a payment creates or the customer pay the payment.
+Dealing with the POST data returned by 歐付寶(OPay) after the a payment creates or the customer pay the payment.
 
 How to Use:
 ==
-You can install using pip. [current release](https://pypi.python.org/pypi/pyallpay)
+You can clone this project and put the Opay folder under root directory of your project.
 
-    pip install pyallpay
+    git clone https://github.com/zenuie/pyOpay.git
 
-Or ... clone this project and put the pyallpay folder under root directory of your project.
-
-    git clone https://github.com/lockys/allPay.py.git
-
-Then include pyallpay into your project if you directly cloned the source code.
+Then include pyOpay into your project if you directly cloned the source code.
 ```python
-from pyallpay import AllPay
+# OPay setting.
+from .Opay import Opay
+from .models import OpayOrder
 ```
 First, you are required to set your own merchant ID, HashIV, HashKey provided by the 歐付寶 in the setting.py
 
-## Set up the /your-app/settings.py in Django
-```python
-ALLPAY_SANDBOX = False # False or True, The sandbox configuration depend on you.
-MERCHANT_ID = 'YOUR_MERCHANT_ID' # Default is '2000132'
-HASH_KEY = 'YOUR_HASH_KEY' # Default is '5294y06JbISpM5x9'
-HASH_IV = 'YOUR_HASH_IV' # Default is 'v77hoKGq4kWxNNIS'
-RETURN_URL = 'YOUR_RETURN_URL'
-CLIENT_BACK_URL = 'YOUR_CLIENT_BACK_URL'
-PAYMENT_INFO_URL = 'YOUR_PAYMENT_INFO_URL'
-```
-Pleae check out AllPay's documents for more details to know what those variable means :)
-https://www.allpay.com.tw/Service/API_Help?Anchor=AnchorDoc
+## Set up in /your-admin/ in Django
 
-## Initialize an allPay payment
+Pleae check out OPayReadme in django/opay file documents for more details to know what those variable means :) or
+https://www.opay.tw/Content/files/O_Pay_011.pdf
 
-Take Django as instance.([A Django example](https://github.com/lockys/allPay.py/tree/master/demo_django_app)
+## Initialize an OPay payment
+
+Take Django as instance.([A Django example](https://github.com/lockys/OPay.py/tree/master/demo_django_app)
 )
 In your Django view.
 ```python
-from pyallpay import AllPay
-
-payment_info = {'TotalAmount': 10, 'ChoosePayment': 'ATM', 'MerchantTradeNo': 'xvd123test', 'ItemName': "test"}
-ap = AllPay(payment_info)
-# check out, this will return a dictionary containing checkValue...etc.
-dict_url = ap.check_out()
-# generate the submit form html
-form_html = ap.gen_check_out_form(dict_url)
+        op = Opay({'TotalAmount': amount,
+                   'ItemName': '破破的贊助費',
+                   'TradeDesc': '給予實況主暖心照顧',
+                   })
+        dict_url = op.check_out()
+        create_order = OpayOrder.objects.create(
+            Sponsor=sponsor,
+            Message=message,
+            MerchantTradeNo=dict_url['MerchantTradeNo'],
+            MerchantTradeDate=dict_url['MerchantTradeDate'],
+            TotalAmount=dict_url['TotalAmount'],
+            TradeDesc=dict_url['TradeDesc'],
+            ItemName=dict_url['ItemName'],
+            CheckMacValue=dict_url['CheckMacValue'])
+        create_order.save()
 ```
 #### How to specify `payment_info` dictionary
 ```python
@@ -80,45 +77,39 @@ payment_info = {'TotalAmount': 10, 'ChoosePayment': 'ATM', 'MerchantTradeNo': 'x
 - ChooseSubPayment(String)
 
 You can find what each parameter means at:
-[AllPay Doc](https://www.allpay.com.tw/Service/API_Help?Anchor=AnchorDoc)
+[OPay Doc](https://www.opay.tw/Content/files/O_Pay_011.pdf)
 
-`form_html` is a form in HTML, pyallpay will automatically send the request to AllPay for you.
-if you want to send by yourself, just disable **auto_send**, like the below code.
-```python
-form_html = ap.gen_check_out_form(dict_url, False)
-```
-and you have to do submit #allPay-Form in your JavaScript.
-```javascript
-$('#allPay-Form').submit();
-```
 
-## Retrive the POST data from allPay(歐付寶)
+
+## Retrive the POST data from OPay(歐付寶)
 ```python
-from pyallpay import AllPay
-returns = AllPay.checkout_feedback(request.POST) #Django for ex.
+# OPay setting.
+from .Opay import Opay
+from .models import OpayOrder
+returns = Opay.checkout_feedback(request.POST) #Django for ex.
 ```
-**returns** will be a dict. that contains the information returned from allPay(歐付寶)
+**returns** will be a dict. that contains the information returned from OPay(歐付寶)
 For example, **returns['RtnCode']** indicates the current status of a payment.
-Check out the [allPay Documentation](https://www.allpay.com.tw/Service/API_Help?Anchor=AnchorDoc) for more details.
+Check out the [OPay Documentation](https://www.Opay.com.tw/Service/API_Help?Anchor=AnchorDoc) for more details.
 
 Available payment.
 ==
-CVS, Barcode, ATM, WebATM, Credit card
-You could simulate to pay in the administator panel provided by allPay, but you should implement the view by your own in order to catch the feedback data from allPay.
+CVS, Barcode, ATM, WebATM, Credit card, Client Select
+You could simulate to pay in the administator panel provided by OPay, but you should implement the view by your own in order to catch the feedback data from OPay.
 
 Goal:
 ==
-This final goal for this project is to implement the full functionalities of Allpay SDK in Python language.
+This final goal for this project is to implement the full functionalities of Opay SDK in Python language.
 
 Project Current Status:
 ==
 This project is still a baby. Therefore, the bugs may exist. :smiley:  
-I'll try hard to implement all th methods of allPay SDK.  
+I'll try hard to implement O th methods of OPay SDK.  
 **Feel free to open issues and pull request to help this project better**
 
 Environment
 ==
-It has been tested with Django 1.5 and python 2.7.5, and works okay for now.
+It has been tested with Django 4 and python 3, and works okay for now.
 
 LICENCE
 ==
