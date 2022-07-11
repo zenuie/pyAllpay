@@ -1,0 +1,51 @@
+{% load static %}
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>抖內給破破</title>
+    <link href="{% static 'css/opay/create_order.css' %}" rel="stylesheet" type="text/css">
+</head>
+<body>
+<div class="wrapper">
+    <h3>
+        贊助給：<a href="https://www.twitch.tv/popo_sing" target="_blank" style="color: #FFFFFF; font-size: 18px;">https://www.twitch.tv/popo_sing</a>
+    </h3>
+    <form action="{{ url }}" id="sendData" method="post">
+        <div class="sponsor-data">
+            <dl class="spd-box sb-platform">
+                <dt>平台暱稱：</dt>
+                <dd>
+                    {% if user.is_authenticated %}
+                        <input id="sponsor" type="text" name="DonateNickName" maxlength="20" value="{{ request.user.first_name }}" disabled/>
+                    {% else %}
+                        <input id="sponsor" type="text" name="DonateNickName" maxlength="20" placeholder="我們怎麼稱呼您比較好"/>
+                    {% endif %}
+                </dd>
+            </dl>
+            <dl class="spd-box sb-price">
+                <dt>贊助金額：</dt>
+                <dd>
+                    <input id="amount" type="text" name="DonateAmount" maxlength="5" autocomplete="off"
+                           placeholder="請輸入您的贊助金額"/>
+                    <span class="sb-currency">單位：新台幣(元)</span>
+                    <div class="arrowbox arrowbox_error" style="display: none;">請輸入贊助金額。</div>
+                    <p class="red" style="margin-top: 7px;">◎ 贊助金額最低為10元</p>
+                    <p class="red">◎ 如贊助金額低於27元則無法使用超商代碼付款</p>
+                </dd>
+            </dl>
+            <dl class="spd-box sb-msg">
+                <dt>備註留言：</dt>
+                <dd>
+                    <textarea id="message" name="DonateMsg" cols="20" rows="6" placeholder="您可填寫想對實況主所說的話。(非必填)"></textarea>
+                    <p class="red" style="margin-top: 5px; display:inline-block;">(限100字元以內)</p>
+                </dd>
+            </dl>
+        </div>
+        <div class="next_box"><a href="javascript:create_order();" class="btn blue_btn">前往歐付寶付款</a></div>
+    </form>
+</div>
+</body>
+<script src="{% static 'js/jquery-3.6.0.js' %}"></script>
+<script src="{% static 'js/opay/create_order.js' %}"></script>
+</html>
+
