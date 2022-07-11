@@ -104,7 +104,7 @@ This final goal for this project is to implement the full functionalities of Opa
 Project Current Status:
 ==
 This project is still a baby. Therefore, the bugs may exist. :smiley:  
-I'll try hard to implement O th methods of OPay SDK.  
+I'll try hard to implement all th methods of OPay SDK.  
 **Feel free to open issues and pull request to help this project better**
 
 Environment
