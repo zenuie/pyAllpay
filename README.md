@@ -6,7 +6,6 @@ CheckOutString(), CheckOut(), CheckOutFeedback() has been implemented.
 In general, it could be used in web developed by Django ..etc  
 **[!!NOTE!!] OPay may updates their SDK constantly, if `pyOpay` doesn't work. Please file a issue.**
 
-### For Python 3, please refer to the [py3Opay](https://github.com/m85091081/py3Opay) by @ m85091081.
 
 Features:
 ==
